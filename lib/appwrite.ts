@@ -11,7 +11,7 @@ import {
 } from 'react-native-appwrite';
 
 export const config = {
-  platform: 'com.jsm.restate',
+  platform: process.env.EXPO_PUBLIC_APPWRITE_PLATFORM,
   endpoint: process.env.EXPO_PUBLIC_APPWRITE_API_ENDPOINT,
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
   databaseId: process.env.EXPO_PUBLIC_APPWRITE_DB_ID,
@@ -22,7 +22,7 @@ export const config = {
   agentsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_DB_AGENTS_COLLECTION_ID,
   propertiesCollectionId:
     process.env.EXPO_PUBLIC_APPWRITE_DB_PROPERTIES_COLLECTION_ID,
-  bucketId: process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID,
+  bucketId: process.env.EXPO_PUBLIC_APPWRITE_DB_STORAGE_BUCKET_ID,
 };
 
 export const client = new Client();
