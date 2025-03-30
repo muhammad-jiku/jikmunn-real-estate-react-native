@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "jikmunn-real-estate",
+    "name": "Jikmunn Real Estate",
     "slug": "jikmunn-real-estate",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -49,6 +49,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "924c51cd-10b9-42cd-b198-b410b0e5601f"
+      }
+    },
+    "owner": "muhammadjiku"
   }
 }
