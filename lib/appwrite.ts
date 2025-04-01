@@ -1,5 +1,5 @@
-import * as Linking from 'expo-linking';
 import { openAuthSessionAsync } from 'expo-web-browser';
+import { Platform } from 'react-native';
 import {
   Account,
   Avatars,
@@ -38,28 +38,60 @@ export const storage = new Storage(client);
 
 export async function login() {
   try {
-    const redirectUri = Linking.createURL('/');
+    let redirectUri;
+    console.log('platform..', Platform);
+    console.log('window location ..', window.location);
+    // Handle different environments
+    if (Platform.OS === 'web') {
+      // For web platform, use standard web URL
+      redirectUri = window.location.origin;
+    } else {
+      // For mobile platforms (React Native)
+      if (__DEV__) {
+        // Get the Expo development URL - this must match what's in your Appwrite console
+        // The IP and port should match your dev server
+        redirectUri = 'exp://192.168.68.204:8081/--/';
+      } else {
+        // For production builds - must match URL scheme in app.json
+        redirectUri = 'jikmunn-real-estate://';
+      }
+    }
+
+    console.log('redirect uri...', redirectUri);
 
     const response = await account.createOAuth2Token(
       OAuthProvider.Google,
       redirectUri
     );
-    if (!response) throw new Error('Create OAuth2 token failed');
 
-    const browserResult = await openAuthSessionAsync(
-      response.toString(),
-      redirectUri
-    );
-    if (browserResult.type !== 'success')
-      throw new Error('Create OAuth2 token failed');
+    console.log('response...', response);
+    if (!response) throw new Error('Create OAuth2 token failed!');
 
-    const url = new URL(browserResult.url);
-    const secret = url.searchParams.get('secret')?.toString();
-    const userId = url.searchParams.get('userId')?.toString();
-    if (!secret || !userId) throw new Error('Create OAuth2 token failed');
+    // Handle different authentication flows based on platform
+    if (Platform.OS === 'web') {
+      // For web, typically redirect directly
+      window.location.href = response.href;
+      return true; // This line may not be reached due to redirect
+    } else {
+      // For mobile, use the web browser session approach
+      const browserResult = await openAuthSessionAsync(
+        response.href.toString(),
+        redirectUri
+      );
 
-    const session = await account.createSession(userId, secret);
-    if (!session) throw new Error('Failed to create session');
+      console.log(browserResult);
+
+      if (browserResult.type !== 'success')
+        throw new Error('Create OAuth2 token failed');
+
+      const url = new URL(browserResult.url);
+      const secret = url.searchParams.get('secret')?.toString();
+      const userId = url.searchParams.get('userId')?.toString();
+      if (!secret || !userId) throw new Error('Create OAuth2 token failed');
+
+      const session = await account.createSession(userId, secret);
+      if (!session) throw new Error('Failed to create session');
+    }
 
     return true;
   } catch (error) {
